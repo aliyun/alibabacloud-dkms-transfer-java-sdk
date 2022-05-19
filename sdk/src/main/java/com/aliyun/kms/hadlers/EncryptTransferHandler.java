@@ -57,7 +57,7 @@ public class EncryptTransferHandler implements KmsTransferHandler<com.aliyun.dkm
         }
         com.aliyun.dkms.gcs.sdk.models.EncryptRequest encryptDKmsRequest = new com.aliyun.dkms.gcs.sdk.models.EncryptRequest();
         encryptDKmsRequest.setKeyId(encryptKmsRequest.getKeyId());
-        encryptDKmsRequest.setPlaintext(encryptKmsRequest.getPlaintext().getBytes(StandardCharsets.UTF_8));
+        encryptDKmsRequest.setPlaintext(base64.decode(encryptKmsRequest.getPlaintext()));
         if (!StringUtils.isEmpty(encryptKmsRequest.getEncryptionContext())) {
             encryptDKmsRequest.setAad(encryptKmsRequest.getEncryptionContext().getBytes(StandardCharsets.UTF_8));
         }

@@ -78,7 +78,7 @@ public class DecryptTransferHandler implements KmsTransferHandler<com.aliyun.dkm
     public HttpResponse transferResponse(com.aliyun.dkms.gcs.sdk.models.DecryptResponse response) {
         final DecryptResponse decryptKmsResponse = new DecryptResponse();
         decryptKmsResponse.setKeyId(response.getKeyId());
-        decryptKmsResponse.setPlaintext(new String(response.getPlaintext(), StandardCharsets.UTF_8));
+        decryptKmsResponse.setPlaintext(base64.encodeAsString(response.getPlaintext()));
         decryptKmsResponse.setRequestId(response.getRequestId());
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);
