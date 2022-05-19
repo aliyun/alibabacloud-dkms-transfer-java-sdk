@@ -17,4 +17,6 @@ public interface Constants {
     String KMS_KEY_PAIR_AES_128 = "AES_128";
     String REQUEST_ID_KEY_NAME = "requestId";
     String MIGRATION_KEY_VERSION_ID_KEY = "x-kms-migrationkeyversionid";
+    int NUMBER_OF_BYTES_AES_256 = 32;
+    int NUMBER_OF_BYTES_AES_128 = 16;
 }
