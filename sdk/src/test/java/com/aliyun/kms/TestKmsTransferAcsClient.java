@@ -43,8 +43,8 @@ public class TestKmsTransferAcsClient {
     @Test
     public void testAsymmetricDecrypt() throws Exception {
         AsymmetricDecryptRequest request = new AsymmetricDecryptRequest();
-//        request.setCiphertextBlob(asymmetricEncrypt().getCiphertextBlob());
-        request.setCiphertextBlob(properties.getProperty("asymmetric.decrypt.ciphertextBlob"));
+        request.setCiphertextBlob(asymmetricEncrypt().getCiphertextBlob());
+//        request.setCiphertextBlob(properties.getProperty("asymmetric.decrypt.ciphertextBlob"));
         request.setKeyId(properties.getProperty("asymmetric.encrypt.keyId"));
         request.setAlgorithm(properties.getProperty("asymmetric.encrypt.algorithm"));
         try {
@@ -91,25 +91,16 @@ public class TestKmsTransferAcsClient {
             throw new RuntimeException(e);
         }
     }
-
-    @Test
-    public void testEncrypt() throws Exception {
-        encrypt();
-    }
-
-    private static final Base64 base64 = new Base64();
-
-    @Test
-    public void testDecrypt() throws Exception {
+    public DecryptResponse decrypt(String ciphertextBlob) throws Exception {
         try {
             DecryptRequest request = new DecryptRequest();
-//            request.setCiphertextBlob(encrypt().getCiphertextBlob());
-            request.setCiphertextBlob(properties.getProperty("decrypt.ciphertextBlob"));
+            request.setCiphertextBlob(ciphertextBlob);
             request.setEncryptionContext(properties.getProperty("encrypt.encryption.context"));
             DecryptResponse response = client.getAcsResponse(request);
             System.out.printf("KeyId: %s%n", response.getKeyId());
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("Plaintext: %s%n", response.getPlaintext());
+            return response;
         } catch (ServerException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -119,6 +110,18 @@ public class TestKmsTransferAcsClient {
             System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
+    }
+    @Test
+    public void testEncrypt() throws Exception {
+        encrypt();
+    }
+
+    private static final Base64 base64 = new Base64();
+
+    @Test
+    public void testDecrypt() throws Exception {
+        //properties.getProperty("decrypt.ciphertextBlob")
+        decrypt(encrypt().getCiphertextBlob());
     }
 
     @Test
@@ -132,6 +135,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
             System.out.printf("Plaintext: %s%n", response.getPlaintext());
+            DecryptResponse decryptResponse = decrypt(response.getCiphertextBlob());
+            assert response.getPlaintext().equals(decryptResponse.getPlaintext());
         } catch (ServerException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -147,13 +152,14 @@ public class TestKmsTransferAcsClient {
     public void testGenerateDataKeyWithoutPlaintext() throws Exception {
         GenerateDataKeyWithoutPlaintextRequest request = new GenerateDataKeyWithoutPlaintextRequest();
         request.setKeyId(properties.getProperty("encrypt.keyId"));
-        request.setKeySpec(properties.getProperty("generateDataKey.keySpec"));
+//        request.setKeySpec(properties.getProperty("generateDataKey.keySpec"));
         request.setEncryptionContext(properties.getProperty("encrypt.encryption.context"));
         try {
             GenerateDataKeyWithoutPlaintextResponse response = client.getAcsResponse(request);
             System.out.printf("KeyId: %s%n", response.getKeyId());
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
+            decrypt(response.getCiphertextBlob());
         } catch (ServerException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -188,6 +194,7 @@ public class TestKmsTransferAcsClient {
     public EncryptResponse encrypt() throws Exception {
         EncryptRequest request = new EncryptRequest();
         request.setKeyId(properties.getProperty("encrypt.keyId"));
+
         request.setPlaintext(properties.getProperty("encrypt.plaintext"));
         request.setEncryptionContext(properties.getProperty("encrypt.encryption.context"));
         try {

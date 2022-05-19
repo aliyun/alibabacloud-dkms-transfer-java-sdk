@@ -2,6 +2,8 @@ package com.aliyun.kms.hadlers;
 
 import com.aliyun.dkms.gcs.openapi.util.models.RuntimeOptions;
 import com.aliyun.dkms.gcs.sdk.Client;
+import com.aliyun.kms.utils.ArrayUtils;
+import com.aliyun.kms.utils.Constants;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.AcsResponse;
 import com.aliyuncs.exceptions.ClientException;
@@ -17,6 +19,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.aliyun.kms.utils.Constants.*;
 import static com.aliyun.kms.utils.KmsErrorCodeTransferUtils.INVALID_PARAMETER_ERROR_CODE;
@@ -26,7 +31,9 @@ public class GenerateDataKeyTransferHandler implements KmsTransferHandler<com.al
 
     private static final Base64 base64 = new Base64();
     private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).setPrettyPrinting().disableHtmlEscaping().create();
-
+    private static final List<String> responseHeaders = new ArrayList<String>() {{
+        add(Constants.MIGRATION_KEY_VERSION_ID_KEY);
+    }};
     private final Client client;
     private final String action;
 
@@ -71,16 +78,23 @@ public class GenerateDataKeyTransferHandler implements KmsTransferHandler<com.al
 
     @Override
     public com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyResponse callDKMS(com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyRequest dkmsRequest, RuntimeOptions runtimeOptions) throws Exception {
+        runtimeOptions.setResponseHeaders(responseHeaders);
         return client.generateDataKeyWithOptions(dkmsRequest, runtimeOptions);
     }
 
     @Override
-    public HttpResponse transferResponse(com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyResponse response) {
+    public HttpResponse transferResponse(com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyResponse response) throws ClientException {
+        Map<String, String> responseHeaders = response.getResponseHeaders();
+        String versionId;
+        if (responseHeaders == null || responseHeaders.size() == 0 || StringUtils.isEmpty(versionId = responseHeaders.get(Constants.MIGRATION_KEY_VERSION_ID_KEY))) {
+            throw new ClientException(String.format("Can not found response headers parameter[%s]", Constants.MIGRATION_KEY_VERSION_ID_KEY));
+        }
+        byte[] ciphertextBlob = ArrayUtils.concatAll(versionId.getBytes(StandardCharsets.UTF_8), response.getIv(), response.getCiphertextBlob());
         final GenerateDataKeyResponse generateDataKeyKmsResponse = new GenerateDataKeyResponse();
         generateDataKeyKmsResponse.setKeyId(response.getKeyId());
         generateDataKeyKmsResponse.setRequestId(response.getRequestId());
         generateDataKeyKmsResponse.setPlaintext(base64.encodeAsString(response.getPlaintext()));
-        generateDataKeyKmsResponse.setCiphertextBlob(base64.encodeAsString(response.getCiphertextBlob()));
+        generateDataKeyKmsResponse.setCiphertextBlob(base64.encodeAsString(ciphertextBlob));
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);
         httpResponse.setHttpContent(gson.toJson(generateDataKeyKmsResponse).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8.displayName(), FormatType.JSON);
