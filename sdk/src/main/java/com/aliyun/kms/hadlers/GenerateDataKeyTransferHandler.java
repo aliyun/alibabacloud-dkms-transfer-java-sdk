@@ -18,8 +18,7 @@ import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 
-import static com.aliyun.kms.utils.Constants.KMS_KEY_PAIR_AES_128;
-import static com.aliyun.kms.utils.Constants.KMS_KEY_PAIR_AES_256;
+import static com.aliyun.kms.utils.Constants.*;
 import static com.aliyun.kms.utils.KmsErrorCodeTransferUtils.INVALID_PARAMETER_ERROR_CODE;
 import static com.aliyun.kms.utils.KmsErrorCodeTransferUtils.INVALID_PARAMETER_KEY_SPEC_ERROR_MESSAGE;
 
@@ -56,9 +55,9 @@ public class GenerateDataKeyTransferHandler implements KmsTransferHandler<com.al
         Integer numberOfBytes = generateDataKeyKmsRequest.getNumberOfBytes();
         if (numberOfBytes == null) {
             if (StringUtils.isEmpty(keySpec) || KMS_KEY_PAIR_AES_256.equals(keySpec)) {
-                numberOfBytes = 256;
+                numberOfBytes = NUMBER_OF_BYTES_AES_256;
             } else if (KMS_KEY_PAIR_AES_128.equals(keySpec)) {
-                numberOfBytes = 128;
+                numberOfBytes = NUMBER_OF_BYTES_AES_128;
             } else {
                 throw new ClientException(INVALID_PARAMETER_ERROR_CODE, INVALID_PARAMETER_KEY_SPEC_ERROR_MESSAGE);
             }

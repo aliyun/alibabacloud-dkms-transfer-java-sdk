@@ -49,6 +49,7 @@ public class AsymmetricDecryptTransferHandler implements KmsTransferHandler<com.
         com.aliyun.dkms.gcs.sdk.models.DecryptRequest asymmetricDecryptDKmsRequest = new com.aliyun.dkms.gcs.sdk.models.DecryptRequest();
         asymmetricDecryptDKmsRequest.setKeyId(asymmetricDecryptKmsRequest.getKeyId());
         asymmetricDecryptDKmsRequest.setCiphertextBlob(base64.decode(asymmetricDecryptKmsRequest.getCiphertextBlob()));
+        asymmetricDecryptDKmsRequest.setAlgorithm(asymmetricDecryptKmsRequest.getAlgorithm());
         return asymmetricDecryptDKmsRequest;
     }
 
