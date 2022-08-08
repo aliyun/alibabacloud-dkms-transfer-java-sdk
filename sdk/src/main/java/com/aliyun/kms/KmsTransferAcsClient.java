@@ -91,6 +91,7 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         handlers.put(GENERATE_DATA_KEY_API_NAME, new GenerateDataKeyTransferHandler(client, GENERATE_DATA_KEY_API_NAME));
         handlers.put(GENERATE_DATA_KEY_WITHOUT_PLAINTEXT_API_NAME, new GenerateDataKeyWithoutPlaintextTransferHandler(client, GENERATE_DATA_KEY_WITHOUT_PLAINTEXT_API_NAME));
         handlers.put(GET_PUBLIC_KEY_API_NAME, new GetPublicKeyTransferHandler(client, GET_PUBLIC_KEY_API_NAME));
+        handlers.put(GET_SECRET_VALUE_API_NAME, new GetSecretValueTransferHandler(client, GET_SECRET_VALUE_API_NAME));
     }
 
     @Override

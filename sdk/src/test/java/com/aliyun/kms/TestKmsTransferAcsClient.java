@@ -191,6 +191,26 @@ public class TestKmsTransferAcsClient {
         }
     }
 
+    @Test
+    public void testGetSecretValue() throws Exception {
+        GetSecretValueRequest request = new GetSecretValueRequest();
+        request.setSecretName(properties.getProperty("secret.name"));
+        try {
+            GetSecretValueResponse response = client.getAcsResponse(request);
+            System.out.printf("SecretData: %s%n", response.getSecretData());
+            System.out.printf("ExtendedConfig: %s%n", response.getExtendedConfig());
+            System.out.printf("CreateTime: %s%n", response.getCreateTime());
+        } catch (ServerException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (ClientException e) {
+            System.out.println("ErrCode:" + e.getErrCode());
+            System.out.println("ErrMsg:" + e.getErrMsg());
+            System.out.println("RequestId:" + e.getRequestId());
+            throw new RuntimeException(e);
+        }
+    }
+
     public EncryptResponse encrypt() throws Exception {
         EncryptRequest request = new EncryptRequest();
         request.setKeyId(properties.getProperty("encrypt.keyId"));

@@ -12,6 +12,7 @@ public interface Constants {
     String GENERATE_DATA_KEY_API_NAME = "GenerateDataKey";
     String GENERATE_DATA_KEY_WITHOUT_PLAINTEXT_API_NAME = "GenerateDataKeyWithoutPlaintext";
     String GET_PUBLIC_KEY_API_NAME = "GetPublicKey";
+    String GET_SECRET_VALUE_API_NAME = "GetSecretValue";
     String DIGEST_MESSAGE_TYPE = "DIGEST";
     String KMS_KEY_PAIR_AES_256 = "AES_256";
     String KMS_KEY_PAIR_AES_128 = "AES_128";

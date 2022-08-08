@@ -9,18 +9,11 @@ import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.AsymmetricDecryptRequest;
 import com.aliyuncs.kms.model.v20160120.DecryptResponse;
 import com.aliyuncs.utils.StringUtils;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 
 public class AsymmetricDecryptTransferHandler implements KmsTransferHandler<com.aliyun.dkms.gcs.sdk.models.DecryptRequest, com.aliyun.dkms.gcs.sdk.models.DecryptResponse> {
-
-    private static final Base64 base64 = new Base64();
-    private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).setPrettyPrinting().disableHtmlEscaping().create();
 
     private final Client client;
     private final String action;
@@ -62,7 +55,7 @@ public class AsymmetricDecryptTransferHandler implements KmsTransferHandler<com.
     public HttpResponse transferResponse(com.aliyun.dkms.gcs.sdk.models.DecryptResponse response) {
         final DecryptResponse asymmetricDecryptKmsResponse = new DecryptResponse();
         asymmetricDecryptKmsResponse.setKeyId(response.getKeyId());
-        asymmetricDecryptKmsResponse.setPlaintext(base64.encodeAsString(response.getPlaintext()));
+        asymmetricDecryptKmsResponse.setPlaintext(base64.encodeToString(response.getPlaintext()));
         asymmetricDecryptKmsResponse.setRequestId(response.getRequestId());
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);

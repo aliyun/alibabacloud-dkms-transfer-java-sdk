@@ -12,18 +12,11 @@ import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.AsymmetricEncryptRequest;
 import com.aliyuncs.kms.model.v20160120.AsymmetricEncryptResponse;
 import com.aliyuncs.utils.StringUtils;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 
 public class AsymmetricEncryptTransferHandler implements KmsTransferHandler<com.aliyun.dkms.gcs.sdk.models.EncryptRequest, com.aliyun.dkms.gcs.sdk.models.EncryptResponse> {
-
-    private static final Base64 base64 = new Base64();
-    private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).setPrettyPrinting().disableHtmlEscaping().create();
 
     private final Client client;
     private final String action;
@@ -65,7 +58,7 @@ public class AsymmetricEncryptTransferHandler implements KmsTransferHandler<com.
     public HttpResponse transferResponse(EncryptResponse response) {
         final AsymmetricEncryptResponse asymmetricEncryptKmsResponse = new AsymmetricEncryptResponse();
         asymmetricEncryptKmsResponse.setKeyId(response.getKeyId());
-        asymmetricEncryptKmsResponse.setCiphertextBlob(base64.encodeAsString(response.getCiphertextBlob()));
+        asymmetricEncryptKmsResponse.setCiphertextBlob(base64.encodeToString(response.getCiphertextBlob()));
         asymmetricEncryptKmsResponse.setRequestId(response.getRequestId());
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);

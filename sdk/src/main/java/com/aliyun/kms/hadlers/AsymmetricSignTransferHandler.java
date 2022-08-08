@@ -9,10 +9,6 @@ import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.AsymmetricSignRequest;
 import com.aliyuncs.kms.model.v20160120.AsymmetricSignResponse;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
@@ -20,9 +16,6 @@ import java.nio.charset.StandardCharsets;
 import static com.aliyun.kms.utils.Constants.DIGEST_MESSAGE_TYPE;
 
 public class AsymmetricSignTransferHandler implements KmsTransferHandler<com.aliyun.dkms.gcs.sdk.models.SignRequest, com.aliyun.dkms.gcs.sdk.models.SignResponse> {
-
-    private static final Base64 base64 = new Base64();
-    private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).setPrettyPrinting().disableHtmlEscaping().create();
 
     private final Client client;
     private final String action;
@@ -65,7 +58,7 @@ public class AsymmetricSignTransferHandler implements KmsTransferHandler<com.ali
     public HttpResponse transferResponse(com.aliyun.dkms.gcs.sdk.models.SignResponse response) {
         final com.aliyuncs.kms.model.v20160120.AsymmetricSignResponse asymmetricSignKmsResponse = new AsymmetricSignResponse();
         asymmetricSignKmsResponse.setKeyId(response.getKeyId());
-        asymmetricSignKmsResponse.setValue(base64.encodeAsString(response.getSignature()));
+        asymmetricSignKmsResponse.setValue(base64.encodeToString(response.getSignature()));
         asymmetricSignKmsResponse.setRequestId(response.getRequestId());
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);
