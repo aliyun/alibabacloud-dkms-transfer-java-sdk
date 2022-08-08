@@ -7,16 +7,11 @@ import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.GetPublicKeyRequest;
 import com.aliyuncs.kms.model.v20160120.GetPublicKeyResponse;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 
 public class GetPublicKeyTransferHandler implements KmsTransferHandler<com.aliyun.dkms.gcs.sdk.models.GetPublicKeyRequest, com.aliyun.dkms.gcs.sdk.models.GetPublicKeyResponse> {
-
-    private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).setPrettyPrinting().disableHtmlEscaping().create();
 
     private final Client client;
     private final String action;

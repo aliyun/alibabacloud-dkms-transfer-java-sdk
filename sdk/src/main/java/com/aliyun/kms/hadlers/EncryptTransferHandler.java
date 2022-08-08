@@ -12,10 +12,6 @@ import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.EncryptRequest;
 import com.aliyuncs.kms.model.v20160120.EncryptResponse;
 import com.aliyuncs.utils.StringUtils;
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
@@ -25,8 +21,6 @@ import java.util.Map;
 
 public class EncryptTransferHandler implements KmsTransferHandler<com.aliyun.dkms.gcs.sdk.models.EncryptRequest, com.aliyun.dkms.gcs.sdk.models.EncryptResponse> {
 
-    private static final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).setPrettyPrinting().disableHtmlEscaping().create();
-    private static final Base64 base64 = new Base64();
     private static final List<String> responseHeaders = new ArrayList<String>() {{
         add(Constants.MIGRATION_KEY_VERSION_ID_KEY);
     }};
@@ -80,7 +74,7 @@ public class EncryptTransferHandler implements KmsTransferHandler<com.aliyun.dkm
             throw new ClientException(String.format("Can not found response headers parameter[%s]", Constants.MIGRATION_KEY_VERSION_ID_KEY));
         }
         byte[] ciphertextBlob = ArrayUtils.concatAll(versionId.getBytes(StandardCharsets.UTF_8), response.getIv(), response.getCiphertextBlob());
-        encryptKmsResponse.setCiphertextBlob(base64.encodeAsString(ciphertextBlob));
+        encryptKmsResponse.setCiphertextBlob(base64.encodeToString(ciphertextBlob));
         encryptKmsResponse.setRequestId(response.getRequestId());
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);
