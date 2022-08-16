@@ -87,7 +87,10 @@ public interface KmsTransferHandler<DReq extends TeaModel, DRep extends TeaModel
 
     default ClientException transferTeaUnretryableException(TeaUnretryableException e, String actionName) {
         if (e.getCause() != null && e.getCause() instanceof TeaRetryableException) {
-            if (e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketTimeoutException) {
+            if ((e.getCause().getMessage() != null && e.getCause().getMessage().contains("Read timed out"))
+                    || (e.getCause().getMessage() != null && e.getCause().getMessage().contains("timeout"))
+                    || (e.getCause().getCause() != null && e.getCause().getCause() instanceof SocketTimeoutException)
+                    || (e.getCause().getCause() != null && e.getCause().getCause().getCause() != null && e.getCause().getCause().getCause() instanceof SocketTimeoutException)) {
                 return new ClientException("SDK.ReadTimeout",
                         "SocketTimeoutException has occurred on a socket read or accept.The action is " +
                                 actionName, e.getCause().getCause());
