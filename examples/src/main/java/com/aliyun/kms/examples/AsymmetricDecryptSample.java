@@ -39,7 +39,9 @@ public class AsymmetricDecryptSample {
         try {
             AsymmetricDecryptResponse response = client.getAcsResponse(request);
             System.out.printf("KeyId: %s%n", response.getKeyId());
+            System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("Plaintext: %s%n", response.getPlaintext());
+            System.out.printf("RequestId: %s%n", response.getRequestId());
         } catch (ServerException e) {
             e.printStackTrace();
         } catch (ClientException e) {

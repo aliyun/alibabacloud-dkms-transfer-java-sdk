@@ -5,6 +5,7 @@ import com.aliyun.kms.utils.ConfigUtils;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
+import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpClientConfig;
 import com.aliyuncs.kms.model.v20160120.*;
 import com.aliyuncs.profile.DefaultProfile;
@@ -195,6 +196,7 @@ public class TestKmsTransferAcsClient {
     public void testGetSecretValue() throws Exception {
         GetSecretValueRequest request = new GetSecretValueRequest();
         request.setSecretName(properties.getProperty("secret.name"));
+//        request.setSysAcceptFormat(FormatType.XML);
         try {
             GetSecretValueResponse response = client.getAcsResponse(request);
             System.out.printf("SecretData: %s%n", response.getSecretData());

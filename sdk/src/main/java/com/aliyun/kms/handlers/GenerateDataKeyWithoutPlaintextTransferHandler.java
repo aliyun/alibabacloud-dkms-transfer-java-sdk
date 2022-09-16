@@ -1,4 +1,4 @@
-package com.aliyun.kms.hadlers;
+package com.aliyun.kms.handlers;
 
 import com.aliyun.dkms.gcs.openapi.util.models.RuntimeOptions;
 import com.aliyun.dkms.gcs.sdk.Client;
@@ -77,20 +77,21 @@ public class GenerateDataKeyWithoutPlaintextTransferHandler implements KmsTransf
     }
 
     @Override
-    public HttpResponse transferResponse(com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyResponse response) throws ClientException {
+    public HttpResponse transferResponse(AcsRequest request, com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyResponse response) throws ClientException {
         Map<String, String> responseHeaders = response.getResponseHeaders();
-        String versionId;
-        if (responseHeaders == null || responseHeaders.size() == 0 || StringUtils.isEmpty(versionId = responseHeaders.get(Constants.MIGRATION_KEY_VERSION_ID_KEY))) {
+        String keyVersionId;
+        if (responseHeaders == null || responseHeaders.size() == 0 || StringUtils.isEmpty(keyVersionId = responseHeaders.get(Constants.MIGRATION_KEY_VERSION_ID_KEY))) {
             throw new ClientException(String.format("Can not found response headers parameter[%s]", Constants.MIGRATION_KEY_VERSION_ID_KEY));
         }
-        byte[] ciphertextBlob = ArrayUtils.concatAll(versionId.getBytes(StandardCharsets.UTF_8), response.getIv(), response.getCiphertextBlob());
+        byte[] ciphertextBlob = ArrayUtils.concatAll(keyVersionId.getBytes(StandardCharsets.UTF_8), response.getIv(), response.getCiphertextBlob());
         final GenerateDataKeyWithoutPlaintextResponse generateDataKeyWithoutPlaintextKmsResponse = new GenerateDataKeyWithoutPlaintextResponse();
         generateDataKeyWithoutPlaintextKmsResponse.setKeyId(response.getKeyId());
+        generateDataKeyWithoutPlaintextKmsResponse.setKeyVersionId(keyVersionId);
         generateDataKeyWithoutPlaintextKmsResponse.setRequestId(response.getRequestId());
         generateDataKeyWithoutPlaintextKmsResponse.setCiphertextBlob(base64.encodeToString(ciphertextBlob));
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);
-        httpResponse.setHttpContent(gson.toJson(generateDataKeyWithoutPlaintextKmsResponse).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8.displayName(), FormatType.JSON);
+        httpResponse.setHttpContent(getHttpContent(request.getSysAcceptFormat(), generateDataKeyWithoutPlaintextKmsResponse), StandardCharsets.UTF_8.displayName(), request.getSysAcceptFormat());
         return httpResponse;
     }
 }
