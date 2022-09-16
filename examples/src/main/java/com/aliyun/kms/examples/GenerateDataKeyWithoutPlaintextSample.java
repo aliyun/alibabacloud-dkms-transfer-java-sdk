@@ -41,6 +41,7 @@ public class GenerateDataKeyWithoutPlaintextSample {
             System.out.printf("KeyId: %s%n", response.getKeyId());
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
+            System.out.printf("RequestId: %s%n", response.getRequestId());
         } catch (ServerException e) {
             e.printStackTrace();
         } catch (ClientException e) {

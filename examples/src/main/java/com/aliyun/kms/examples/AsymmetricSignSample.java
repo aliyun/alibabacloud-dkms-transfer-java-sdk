@@ -42,6 +42,7 @@ public class AsymmetricSignSample {
             System.out.printf("KeyId: %s%n", response.getKeyId());
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("Value: %s%n", response.getValue());
+            System.out.printf("RequestId: %s%n", response.getRequestId());
         } catch (ServerException e) {
             e.printStackTrace();
         } catch (ClientException e) {
