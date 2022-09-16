@@ -1,7 +1,8 @@
-package com.aliyun.kms.hadlers;
+package com.aliyun.kms.handlers;
 
 import com.aliyun.dkms.gcs.openapi.util.models.RuntimeOptions;
 import com.aliyun.dkms.gcs.sdk.Client;
+import com.aliyun.kms.utils.Constants;
 import com.aliyun.tea.utils.StringUtils;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.exceptions.ClientException;
@@ -12,10 +13,17 @@ import com.aliyuncs.kms.model.v20160120.AsymmetricSignResponse;
 import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.aliyun.kms.utils.Constants.DIGEST_MESSAGE_TYPE;
 
 public class AsymmetricSignTransferHandler implements KmsTransferHandler<com.aliyun.dkms.gcs.sdk.models.SignRequest, com.aliyun.dkms.gcs.sdk.models.SignResponse> {
+
+    private static final List<String> responseHeaders = new ArrayList<String>() {{
+        add(Constants.MIGRATION_KEY_VERSION_ID_KEY);
+    }};
 
     private final Client client;
     private final String action;
@@ -51,18 +59,25 @@ public class AsymmetricSignTransferHandler implements KmsTransferHandler<com.ali
 
     @Override
     public com.aliyun.dkms.gcs.sdk.models.SignResponse callDKMS(com.aliyun.dkms.gcs.sdk.models.SignRequest dkmsRequest, RuntimeOptions runtimeOptions) throws Exception {
+        runtimeOptions.setResponseHeaders(responseHeaders);
         return client.signWithOptions(dkmsRequest, runtimeOptions);
     }
 
     @Override
-    public HttpResponse transferResponse(com.aliyun.dkms.gcs.sdk.models.SignResponse response) {
+    public HttpResponse transferResponse(AcsRequest request, com.aliyun.dkms.gcs.sdk.models.SignResponse response) throws ClientException {
+        Map<String, String> responseHeaders = response.getResponseHeaders();
+        String keyVersionId = null;
+        if (responseHeaders != null) {
+            keyVersionId = responseHeaders.get(Constants.MIGRATION_KEY_VERSION_ID_KEY);
+        }
         final com.aliyuncs.kms.model.v20160120.AsymmetricSignResponse asymmetricSignKmsResponse = new AsymmetricSignResponse();
         asymmetricSignKmsResponse.setKeyId(response.getKeyId());
+        asymmetricSignKmsResponse.setKeyVersionId(keyVersionId);
         asymmetricSignKmsResponse.setValue(base64.encodeToString(response.getSignature()));
         asymmetricSignKmsResponse.setRequestId(response.getRequestId());
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);
-        httpResponse.setHttpContent(gson.toJson(asymmetricSignKmsResponse).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8.displayName(), FormatType.JSON);
+        httpResponse.setHttpContent(getHttpContent(request.getSysAcceptFormat(), asymmetricSignKmsResponse), StandardCharsets.UTF_8.displayName(), request.getSysAcceptFormat());
         return httpResponse;
     }
 

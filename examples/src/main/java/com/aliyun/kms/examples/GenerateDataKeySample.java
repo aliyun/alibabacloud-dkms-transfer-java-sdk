@@ -41,6 +41,7 @@ public class GenerateDataKeySample {
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
             System.out.printf("Plaintext: %s%n", response.getPlaintext());
+            System.out.printf("RequestId: %s%n", response.getRequestId());
         } catch (ServerException e) {
             e.printStackTrace();
         } catch (ClientException e) {
