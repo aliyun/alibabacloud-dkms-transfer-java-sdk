@@ -1,8 +1,9 @@
-package com.aliyun.kms.hadlers;
+package com.aliyun.kms.handlers;
 
 import com.aliyun.dkms.gcs.openapi.Client;
 import com.aliyun.dkms.gcs.openapi.util.models.RuntimeOptions;
 import com.aliyun.kms.utils.KmsErrorCodeTransferUtils;
+import com.aliyun.kms.utils.XmlUtil;
 import com.aliyun.tea.TeaException;
 import com.aliyun.tea.TeaModel;
 import com.aliyun.tea.TeaRetryableException;
@@ -13,6 +14,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ErrorCodeConstant;
 import com.aliyuncs.exceptions.ErrorMessageConstant;
 import com.aliyuncs.exceptions.ServerException;
+import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.utils.StringUtils;
 import com.google.gson.FieldNamingPolicy;
@@ -22,6 +24,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.codec.binary.Base64;
 
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static com.aliyun.kms.utils.Constants.REQUEST_ID_KEY_NAME;
@@ -39,11 +42,13 @@ public interface KmsTransferHandler<DReq extends TeaModel, DRep extends TeaModel
     default <T extends AcsResponse> HttpResponse handlerDKmsRequestWithOptions(AcsRequest<T> request, RuntimeOptions runtimeOptions) throws ClientException, ServerException {
         DReq dkmsRequest = buildDKMSRequest(request, runtimeOptions);
         try {
-            return transferResponse(callDKMS(dkmsRequest, runtimeOptions));
+            return transferResponse(request, callDKMS(dkmsRequest, runtimeOptions));
         } catch (TeaException e) {
             throw transferTeaException(e);
         } catch (TeaUnretryableException e) {
             throw transferTeaUnretryableException(e, request.getSysActionName());
+        } catch (ClientException e) {
+            throw e;
         } catch (Exception e) {
             throw transferException(e, request.getSysActionName());
         }
@@ -53,7 +58,7 @@ public interface KmsTransferHandler<DReq extends TeaModel, DRep extends TeaModel
 
     DRep callDKMS(DReq dkmsRequest, RuntimeOptions runtimeOptions) throws Exception;
 
-    HttpResponse transferResponse(DRep response) throws ClientException;
+    HttpResponse transferResponse(AcsRequest request, DRep response) throws ClientException;
 
     default ClientException transferTeaException(TeaException e) {
         Map<String, Object> data = e.getData();
@@ -111,5 +116,19 @@ public interface KmsTransferHandler<DReq extends TeaModel, DRep extends TeaModel
 
     default ClientException newMissingParameterClientException(String paramName) {
         return new ClientException(MISSING_PARAMETER_ERROR_CODE, String.format("The parameter  %s  needed but no provided.", paramName));
+    }
+
+    default byte[] getHttpContent(FormatType acceptFormat, AcsResponse response) throws ClientException {
+        if (FormatType.JSON.equals(acceptFormat)) {
+            return gson.toJson(response).getBytes(StandardCharsets.UTF_8);
+        } else if (FormatType.XML.equals(acceptFormat)) {
+            try {
+                return XmlUtil.buildRequestXml(response).getBytes(StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                throw new ClientException(e);
+            }
+        } else {
+            throw new ClientException(String.format("Server response has a bad format type: %s;", acceptFormat));
+        }
     }
 }
