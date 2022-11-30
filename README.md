@@ -73,6 +73,10 @@ public class EncryptSample {
         config.setClientKeyFile("<your-client-key-file>");
         config.setPassword("<your-password>");
         config.setEndpoint("<your-endpoint>");
+        // If you want to verify the server certificate, you need to set it as your CA certificate file path
+        config.setCaFilePath("<path/to/yourCaCert>");
+        // Or, set it as the content of your CA certificate
+        //config.setCa("<your-ca-certificate-content");
         DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", "<your-access-key-id>", "<your-access-key-secret>");
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         //To skip https authentication, you can open the comment code here
