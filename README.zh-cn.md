@@ -37,8 +37,8 @@
 ```
 <dependency>
     <groupId>com.aliyun.kms</groupId>
-        <artifactId>kms-transfer-client</artifactId>
-    <version>0.0.3</version>
+    <artifactId>kms-transfer-client</artifactId>
+    <version>0.0.5</version>
 </dependency>
 ```
 
@@ -76,6 +76,10 @@ public class EncryptSample {
         config.setClientKeyFile("<your-client-key-file>");
         config.setPassword("<your-password>");
         config.setEndpoint("<your-endpoint>");
+        // 如需验证服务端证书，这里需要设置为您的服务端证书路径
+        config.setCaFilePath("<path/to/yourCaCert>");
+        // 或者，设置为您的服务端证书内容
+        //config.setCa("<your-ca-certificate-content");
         DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", "<your-access-key-id>", "<your-access-key-secret>");
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         //如需跳过https认证,可打开此处注释代码
