@@ -7,7 +7,6 @@ import com.aliyun.kms.utils.Constants;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.AcsResponse;
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.GenerateDataKeyWithoutPlaintextRequest;
 import com.aliyuncs.kms.model.v20160120.GenerateDataKeyWithoutPlaintextResponse;

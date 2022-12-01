@@ -6,7 +6,6 @@ import com.aliyun.kms.utils.Constants;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.AcsResponse;
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.DecryptRequest;
 import com.aliyuncs.kms.model.v20160120.DecryptResponse;
@@ -81,7 +80,7 @@ public class DecryptTransferHandler implements KmsTransferHandler<com.aliyun.dkm
         final DecryptResponse decryptKmsResponse = new DecryptResponse();
         decryptKmsResponse.setKeyId(response.getKeyId());
         decryptKmsResponse.setKeyVersionId(keyVersionId);
-        decryptKmsResponse.setPlaintext(base64.encodeToString(response.getPlaintext()));
+        decryptKmsResponse.setPlaintext(new String(response.getPlaintext(), StandardCharsets.UTF_8));
         decryptKmsResponse.setRequestId(response.getRequestId());
         HttpResponse httpResponse = new HttpResponse();
         httpResponse.setStatus(HttpStatus.SC_OK);
