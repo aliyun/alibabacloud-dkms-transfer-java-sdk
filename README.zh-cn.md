@@ -38,7 +38,7 @@
 <dependency>
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
 </dependency>
 ```
 

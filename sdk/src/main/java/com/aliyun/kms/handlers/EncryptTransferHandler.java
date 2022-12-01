@@ -7,7 +7,6 @@ import com.aliyun.kms.utils.Constants;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.AcsResponse;
 import com.aliyuncs.exceptions.ClientException;
-import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpResponse;
 import com.aliyuncs.kms.model.v20160120.EncryptRequest;
 import com.aliyuncs.kms.model.v20160120.EncryptResponse;
@@ -51,7 +50,7 @@ public class EncryptTransferHandler implements KmsTransferHandler<com.aliyun.dkm
         }
         com.aliyun.dkms.gcs.sdk.models.EncryptRequest encryptDKmsRequest = new com.aliyun.dkms.gcs.sdk.models.EncryptRequest();
         encryptDKmsRequest.setKeyId(encryptKmsRequest.getKeyId());
-        encryptDKmsRequest.setPlaintext(base64.decode(encryptKmsRequest.getPlaintext()));
+        encryptDKmsRequest.setPlaintext(encryptKmsRequest.getPlaintext().getBytes(StandardCharsets.UTF_8));
         if (!StringUtils.isEmpty(encryptKmsRequest.getEncryptionContext())) {
             encryptDKmsRequest.setAad(encryptKmsRequest.getEncryptionContext().getBytes(StandardCharsets.UTF_8));
         }
