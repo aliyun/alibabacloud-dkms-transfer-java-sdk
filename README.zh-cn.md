@@ -38,7 +38,7 @@
 <dependency>
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
 </dependency>
 ```
 
@@ -50,6 +50,20 @@
 ```
 mvn clean install -DskipTests -Dgpg.skip=true
 ```
+
+## 客户端机制
+阿里云专属KMS适配Java SDK默认将下面列表方法请求转发给专属KMS VPC网关。
+
+* Encrypt
+* Decrypt
+* GenerateDataKey
+* GenerateDataKeyWithoutPlaintext
+* GetPublicKey
+* AsymmetricEncrypt
+* AsymmetricDecrypt
+* AsymmetricSign
+* AsymmetricVerify
+* GetSecretValue
 
 ## 示例代码
 

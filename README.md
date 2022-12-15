@@ -35,7 +35,7 @@ The recommended way to use the Alibaba Cloud Dedicated KMS Transfer Client for J
 <dependency>
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
 </dependency>
 ```
 
@@ -47,6 +47,20 @@ Once you check out the code from GitHub, you can build it using Maven. Use the f
 ```
 mvn clean install -DskipTests -Dgpg.skip=true
 ```
+
+## Client Mechanism
+Alibaba Cloud Dedicated KMS Transfer SDK for Java transfers the the following method of request to dedicated KMS vpc gateway by default.
+
+* Encrypt
+* Decrypt
+* GenerateDataKey
+* GenerateDataKeyWithoutPlaintext
+* GetPublicKey
+* AsymmetricEncrypt
+* AsymmetricDecrypt
+* AsymmetricSign
+* AsymmetricVerify
+* GetSecretValue
 
 
 ## Sample Code
