@@ -35,7 +35,7 @@ The recommended way to use the Alibaba Cloud Dedicated KMS Transfer Client for J
 <dependency>
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.8</version>
 </dependency>
 ```
 
@@ -91,7 +91,8 @@ public class EncryptSample {
         config.setCaFilePath("<path/to/yourCaCert>");
         // Or, set it as the content of your CA certificate
         //config.setCa("<your-ca-certificate-content");
-        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", "<your-access-key-id>", "<your-access-key-secret>");
+        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", System.getenv("<your-access-key-env-name>"), System.getenv("<your-access-key-secret-env-name>"));
+
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         //To skip https authentication, you can open the comment code here
         //clientConfig.setIgnoreSSLCerts(true);

@@ -31,7 +31,8 @@ public class GenerateDataKeySample {
         config.setCaFilePath("<path/to/yourCaCert>");
         // 或者，设置为您的服务端证书内容
         //config.setCa("<your-ca-certificate-content");
-        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", "<your-access-key-id>", "<your-access-key-secret>");
+        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", System.getenv("<your-access-key-env-name>"), System.getenv("<your-access-key-secret-env-name>"));
+
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         //如需跳过https认证,可打开此处注释代码
         //clientConfig.setIgnoreSSLCerts(true);
@@ -59,7 +60,8 @@ public class GenerateDataKeySample {
      * 此方法主要是针对dkmsGenerateDataKey对比使用，一旦完成密钥迁移则无法使用KMS网关调用密码
      */
     private static void kmsGenerateDataKey() {
-        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", "<your-access-key-id>", "<your-access-key-secret>");
+        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", System.getenv("<your-access-key-env-name>"), System.getenv("<your-access-key-secret-env-name>"));
+
         IAcsClient client = new DefaultAcsClient(profile);
         GenerateDataKeyRequest request = new GenerateDataKeyRequest();
         request.setKeyId("<your-key-id>");
