@@ -39,7 +39,7 @@ public class AsymmetricVerifyTransferHandler implements KmsTransferHandler<com.a
 
     @Override
     public String getAction() {
-        return null;
+        return action;
     }
 
     @Override
