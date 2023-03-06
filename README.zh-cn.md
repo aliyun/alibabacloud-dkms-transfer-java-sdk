@@ -38,7 +38,7 @@
 <dependency>
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
 </dependency>
 ```
 
@@ -50,6 +50,20 @@
 ```
 mvn clean install -DskipTests -Dgpg.skip=true
 ```
+
+## 客户端机制
+阿里云专属KMS适配Java SDK默认将下面列表方法请求转发给专属KMS VPC网关。
+
+* Encrypt
+* Decrypt
+* GenerateDataKey
+* GenerateDataKeyWithoutPlaintext
+* GetPublicKey
+* AsymmetricEncrypt
+* AsymmetricDecrypt
+* AsymmetricSign
+* AsymmetricVerify
+* GetSecretValue
 
 ## 示例代码
 
@@ -80,7 +94,8 @@ public class EncryptSample {
         config.setCaFilePath("<path/to/yourCaCert>");
         // 或者，设置为您的服务端证书内容
         //config.setCa("<your-ca-certificate-content");
-        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", "<your-access-key-id>", "<your-access-key-secret>");
+        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", System.getenv("<your-access-key-env-name>"), System.getenv("<your-access-key-secret-env-name>"));
+
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         //如需跳过https认证,可打开此处注释代码
         //clientConfig.setIgnoreSSLCerts(true);

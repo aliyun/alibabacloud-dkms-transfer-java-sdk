@@ -2,6 +2,8 @@ package com.aliyun.kms.handlers;
 
 import com.aliyun.dkms.gcs.openapi.util.models.RuntimeOptions;
 import com.aliyun.dkms.gcs.sdk.Client;
+import com.aliyun.dkms.gcs.sdk.models.EncryptRequest;
+import com.aliyun.dkms.gcs.sdk.models.EncryptResponse;
 import com.aliyun.kms.utils.ArrayUtils;
 import com.aliyun.kms.utils.Constants;
 import com.aliyuncs.AcsRequest;
@@ -72,7 +74,14 @@ public class GenerateDataKeyWithoutPlaintextTransferHandler implements KmsTransf
     @Override
     public com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyResponse callDKMS(com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyRequest dkmsRequest, RuntimeOptions runtimeOptions) throws Exception {
         runtimeOptions.setResponseHeaders(responseHeaders);
-        return client.generateDataKeyWithOptions(dkmsRequest, runtimeOptions);
+        com.aliyun.dkms.gcs.sdk.models.GenerateDataKeyResponse generateDataKeyResponse = client.generateDataKeyWithOptions(dkmsRequest, runtimeOptions);
+        EncryptRequest encryptRequest = new EncryptRequest();
+        encryptRequest.setKeyId(dkmsRequest.getKeyId());
+        encryptRequest.setPlaintext(base64.encodeAsString(generateDataKeyResponse.getPlaintext()).getBytes(StandardCharsets.UTF_8));
+        EncryptResponse encryptResponse = client.encryptWithOptions(encryptRequest, runtimeOptions);
+        generateDataKeyResponse.setCiphertextBlob(encryptResponse.getCiphertextBlob());
+        generateDataKeyResponse.setIv(encryptResponse.getIv());
+        return generateDataKeyResponse;
     }
 
     @Override

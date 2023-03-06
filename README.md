@@ -35,7 +35,7 @@ The recommended way to use the Alibaba Cloud Dedicated KMS Transfer Client for J
 <dependency>
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
 </dependency>
 ```
 
@@ -47,6 +47,20 @@ Once you check out the code from GitHub, you can build it using Maven. Use the f
 ```
 mvn clean install -DskipTests -Dgpg.skip=true
 ```
+
+## Client Mechanism
+Alibaba Cloud Dedicated KMS Transfer SDK for Java transfers the the following method of request to dedicated KMS vpc gateway by default.
+
+* Encrypt
+* Decrypt
+* GenerateDataKey
+* GenerateDataKeyWithoutPlaintext
+* GetPublicKey
+* AsymmetricEncrypt
+* AsymmetricDecrypt
+* AsymmetricSign
+* AsymmetricVerify
+* GetSecretValue
 
 
 ## Sample Code
@@ -77,7 +91,8 @@ public class EncryptSample {
         config.setCaFilePath("<path/to/yourCaCert>");
         // Or, set it as the content of your CA certificate
         //config.setCa("<your-ca-certificate-content");
-        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", "<your-access-key-id>", "<your-access-key-secret>");
+        DefaultProfile profile = DefaultProfile.getProfile("<your-endpoint>", System.getenv("<your-access-key-env-name>"), System.getenv("<your-access-key-secret-env-name>"));
+
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         //To skip https authentication, you can open the comment code here
         //clientConfig.setIgnoreSSLCerts(true);
