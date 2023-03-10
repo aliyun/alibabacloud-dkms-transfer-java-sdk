@@ -2,13 +2,14 @@ package com.aliyun.kms;
 
 import com.aliyun.dkms.gcs.openapi.models.Config;
 import com.aliyun.kms.utils.ConfigUtils;
+import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
-import com.aliyuncs.http.FormatType;
 import com.aliyuncs.http.HttpClientConfig;
 import com.aliyuncs.kms.model.v20160120.*;
 import com.aliyuncs.profile.DefaultProfile;
+import com.aliyuncs.utils.StringUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ public class TestKmsTransferAcsClient {
 
     Properties properties;
     IAcsClient client;
+    IAcsClient kmsClient;
 
     @Before
     public void init() throws Exception {
@@ -29,11 +31,87 @@ public class TestKmsTransferAcsClient {
         config.setClientKeyContent(properties.getProperty("config.clientKeyContent"));
         config.setPassword(properties.getProperty("config.password"));
         config.setEndpoint(properties.getProperty("config.endpoint"));
-        DefaultProfile profile = DefaultProfile.getProfile(properties.getProperty("config.regionId"), properties.getProperty("config.ak"), properties.getProperty("config.sk"));
+        DefaultProfile profile = DefaultProfile.getProfile(properties.getProperty("config.kms.regionId"), System.getenv("accessKeyId"), System.getenv("accessKeySecret"));
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         clientConfig.setIgnoreSSLCerts(Boolean.parseBoolean(properties.getProperty("ignoreSSLCerts")));
         profile.setHttpClientConfig(clientConfig);
         client = new KmsTransferAcsClient(profile, config);
+        kmsClient = new DefaultAcsClient(profile);
+    }
+
+    @Test
+    public void kmsEncrypt() {
+        kmsEncrypt0();
+    }
+
+    @Test
+    public void kmsDecrypt() {
+        kmsDecrypt0("");
+    }
+
+    @Test
+    public void kmsGenerateDataKey() {
+        GenerateDataKeyRequest request = new GenerateDataKeyRequest();
+        request.setKeyId(properties.getProperty("encrypt.keyId"));
+//        request.setKeySpec(properties.getProperty("generateDataKey.keySpec"));
+        request.setEncryptionContext(properties.getProperty("encrypt.encryption.context"));
+        try {
+            GenerateDataKeyResponse response = kmsClient.getAcsResponse(request);
+            System.out.printf("KeyId: %s%n", response.getKeyId());
+            System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
+            System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
+            System.out.printf("Plaintext: %s%n", response.getPlaintext());
+//            DecryptResponse decryptResponse = kmsDecrypt0(response.getCiphertextBlob());
+            DecryptResponse decryptResponse = decrypt(response.getCiphertextBlob());
+            assert response.getPlaintext().equals(decryptResponse.getPlaintext());
+        } catch (ServerException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private EncryptResponse kmsEncrypt0() {
+        EncryptRequest request = new EncryptRequest();
+        request.setKeyId(properties.getProperty("encrypt.keyId"));
+        request.setPlaintext(properties.getProperty("encrypt.plaintext"));
+        String context = properties.getProperty("encrypt.encryption.context");
+        request.setEncryptionContext(context);
+        try {
+            EncryptResponse response = kmsClient.getAcsResponse(request);
+            System.out.printf("KeyId: %s%n", response.getKeyId());
+            System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
+            System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
+            return response;
+        } catch (ServerException e) {
+            throw new RuntimeException(e);
+        } catch (ClientException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public DecryptResponse kmsDecrypt0(String ciphertextBlob) {
+        DecryptRequest request = new DecryptRequest();
+        try {
+//            request.setCiphertextBlob(kmsEncrypt0().getCiphertextBlob());
+            if (StringUtils.isEmpty(ciphertextBlob)) {
+                request.setCiphertextBlob(encrypt().getCiphertextBlob());
+            } else {
+                request.setCiphertextBlob(ciphertextBlob);
+            }
+            request.setEncryptionContext(properties.getProperty("encrypt.encryption.context"));
+            DecryptResponse response = kmsClient.getAcsResponse(request);
+            System.out.printf("KeyId: %s%n", response.getKeyId());
+            System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
+            System.out.printf("Plaintext: %s%n", response.getPlaintext());
+            return response;
+        } catch (ServerException e) {
+            throw new RuntimeException(e);
+        } catch (ClientException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
@@ -54,12 +132,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("Plaintext: %s%n", response.getPlaintext());
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
@@ -83,15 +157,12 @@ public class TestKmsTransferAcsClient {
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("value: %s%n", response.getValue());
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
+
     public DecryptResponse decrypt(String ciphertextBlob) throws Exception {
         try {
             DecryptRequest request = new DecryptRequest();
@@ -103,15 +174,12 @@ public class TestKmsTransferAcsClient {
             System.out.printf("Plaintext: %s%n", response.getPlaintext());
             return response;
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
+
     @Test
     public void testEncrypt() throws Exception {
         encrypt();
@@ -122,7 +190,8 @@ public class TestKmsTransferAcsClient {
     @Test
     public void testDecrypt() throws Exception {
         //properties.getProperty("decrypt.ciphertextBlob")
-        decrypt(encrypt().getCiphertextBlob());
+        decrypt(kmsEncrypt0().getCiphertextBlob());
+//        decrypt(encrypt().getCiphertextBlob());
     }
 
     @Test
@@ -139,12 +208,8 @@ public class TestKmsTransferAcsClient {
             DecryptResponse decryptResponse = decrypt(response.getCiphertextBlob());
             assert response.getPlaintext().equals(decryptResponse.getPlaintext());
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
@@ -162,12 +227,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
             decrypt(response.getCiphertextBlob());
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
@@ -182,12 +243,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             System.out.printf("PublicKey: %s%n", response.getPublicKey());
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
@@ -203,12 +260,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("ExtendedConfig: %s%n", response.getExtendedConfig());
             System.out.printf("CreateTime: %s%n", response.getCreateTime());
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
@@ -218,7 +271,8 @@ public class TestKmsTransferAcsClient {
         request.setKeyId(properties.getProperty("encrypt.keyId"));
 
         request.setPlaintext(properties.getProperty("encrypt.plaintext"));
-        request.setEncryptionContext(properties.getProperty("encrypt.encryption.context"));
+        String context = properties.getProperty("encrypt.encryption.context");
+        request.setEncryptionContext(context);
         try {
             EncryptResponse response = client.getAcsResponse(request);
             System.out.printf("KeyId: %s%n", response.getKeyId());
@@ -226,12 +280,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("CiphertextBlob: %s%n", response.getCiphertextBlob());
             return response;
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
@@ -248,12 +298,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("Value: %s%n", response.getValue());
             return response;
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }
@@ -271,12 +317,8 @@ public class TestKmsTransferAcsClient {
             System.out.printf("KeyVersionId: %s%n", response.getKeyVersionId());
             return response;
         } catch (ServerException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         } catch (ClientException e) {
-            System.out.println("ErrCode:" + e.getErrCode());
-            System.out.println("ErrMsg:" + e.getErrMsg());
-            System.out.println("RequestId:" + e.getRequestId());
             throw new RuntimeException(e);
         }
     }

@@ -6,6 +6,7 @@ import com.aliyun.dkms.gcs.sdk.models.EncryptRequest;
 import com.aliyun.dkms.gcs.sdk.models.EncryptResponse;
 import com.aliyun.kms.utils.ArrayUtils;
 import com.aliyun.kms.utils.Constants;
+import com.aliyun.kms.utils.EncryptionContextUtils;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.AcsResponse;
 import com.aliyuncs.exceptions.ClientException;
@@ -65,8 +66,9 @@ public class GenerateDataKeyTransferHandler implements KmsTransferHandler<com.al
             }
         }
         generateDataKeyDKmsRequest.setNumberOfBytes(numberOfBytes);
-        if (!StringUtils.isEmpty(generateDataKeyKmsRequest.getEncryptionContext())) {
-            generateDataKeyDKmsRequest.setAad(generateDataKeyKmsRequest.getEncryptionContext().getBytes(StandardCharsets.UTF_8));
+        String encryptionContext = generateDataKeyKmsRequest.getEncryptionContext();
+        if (!StringUtils.isEmpty(encryptionContext)) {
+            generateDataKeyDKmsRequest.setAad(EncryptionContextUtils.sortAndEncode(encryptionContext, StandardCharsets.UTF_8));
         }
         return generateDataKeyDKmsRequest;
     }
@@ -78,6 +80,7 @@ public class GenerateDataKeyTransferHandler implements KmsTransferHandler<com.al
         EncryptRequest encryptRequest = new EncryptRequest();
         encryptRequest.setKeyId(dkmsRequest.getKeyId());
         encryptRequest.setPlaintext(base64.encodeAsString(generateDataKeyResponse.getPlaintext()).getBytes(StandardCharsets.UTF_8));
+        encryptRequest.setAad(dkmsRequest.getAad());
         EncryptResponse encryptResponse = client.encryptWithOptions(encryptRequest, runtimeOptions);
         generateDataKeyResponse.setCiphertextBlob(encryptResponse.getCiphertextBlob());
         generateDataKeyResponse.setIv(encryptResponse.getIv());
