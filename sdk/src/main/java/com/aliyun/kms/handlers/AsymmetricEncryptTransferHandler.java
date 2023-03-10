@@ -16,6 +16,7 @@ import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,12 @@ public class AsymmetricEncryptTransferHandler implements KmsTransferHandler<com.
         asymmetricEncryptDKmsRequest.setKeyId(asymmetricEncryptKmsRequest.getKeyId());
         asymmetricEncryptDKmsRequest.setPlaintext(base64.decode(asymmetricEncryptKmsRequest.getPlaintext()));
         asymmetricEncryptDKmsRequest.setAlgorithm(asymmetricEncryptKmsRequest.getAlgorithm());
+        final String keyVersionId = asymmetricEncryptKmsRequest.getKeyVersionId();
+        if(!StringUtils.isEmpty(keyVersionId)) {
+            asymmetricEncryptDKmsRequest.setRequestHeaders(new HashMap<String, String>() {{
+                put(Constants.MIGRATION_KEY_VERSION_ID_KEY, keyVersionId);
+            }});
+        }
         return asymmetricEncryptDKmsRequest;
     }
 

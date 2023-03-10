@@ -13,6 +13,7 @@ import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,12 @@ public class AsymmetricVerifyTransferHandler implements KmsTransferHandler<com.a
         verifyDKmsRequest.setMessage(base64.decode(asymmetricVerifyKmsRequest.getDigest()));
         verifyDKmsRequest.setMessageType(DIGEST_MESSAGE_TYPE);
         verifyDKmsRequest.setSignature(base64.decode(asymmetricVerifyKmsRequest.getValue()));
+        final String keyVersionId = asymmetricVerifyKmsRequest.getKeyVersionId();
+        if(!com.aliyuncs.utils.StringUtils.isEmpty(keyVersionId)) {
+            verifyDKmsRequest.setRequestHeaders(new HashMap<String, String>() {{
+                put(Constants.MIGRATION_KEY_VERSION_ID_KEY, keyVersionId);
+            }});
+        }
         return verifyDKmsRequest;
     }
 
