@@ -3,6 +3,7 @@ package com.aliyun.kms.handlers;
 import com.aliyun.dkms.gcs.openapi.util.models.RuntimeOptions;
 import com.aliyun.dkms.gcs.sdk.Client;
 import com.aliyun.kms.utils.Constants;
+import com.aliyun.kms.utils.EncryptionContextUtils;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.AcsResponse;
 import com.aliyuncs.exceptions.ClientException;
@@ -58,8 +59,9 @@ public class DecryptTransferHandler implements KmsTransferHandler<com.aliyun.dkm
         }});
         decryptDKmsRequest.setIv(ivBytes);
         decryptDKmsRequest.setCiphertextBlob(ciphertextBytes);
-        if (!StringUtils.isEmpty(decryptKmsRequest.getEncryptionContext())) {
-            decryptDKmsRequest.setAad(decryptKmsRequest.getEncryptionContext().getBytes(StandardCharsets.UTF_8));
+        String encryptionContext = decryptKmsRequest.getEncryptionContext();
+        if (!StringUtils.isEmpty(encryptionContext)) {
+            decryptDKmsRequest.setAad(EncryptionContextUtils.sortAndEncode(encryptionContext, StandardCharsets.UTF_8));
         }
         return decryptDKmsRequest;
     }

@@ -6,7 +6,7 @@
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.8</version>
+    <version>0.0.9</version>
     <name>kms-transfer-client</name>
     <url>http://www.aliyun.com</url>
     <description>Alibabacloud KMS Transfer Client for Java

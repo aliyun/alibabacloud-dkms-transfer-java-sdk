@@ -13,6 +13,7 @@ import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,12 @@ public class AsymmetricDecryptTransferHandler implements KmsTransferHandler<com.
         asymmetricDecryptDKmsRequest.setKeyId(asymmetricDecryptKmsRequest.getKeyId());
         asymmetricDecryptDKmsRequest.setCiphertextBlob(base64.decode(asymmetricDecryptKmsRequest.getCiphertextBlob()));
         asymmetricDecryptDKmsRequest.setAlgorithm(asymmetricDecryptKmsRequest.getAlgorithm());
+        final String keyVersionId = asymmetricDecryptKmsRequest.getKeyVersionId();
+        if(!StringUtils.isEmpty(keyVersionId)) {
+            asymmetricDecryptDKmsRequest.setRequestHeaders(new HashMap<String, String>() {{
+                put(Constants.MIGRATION_KEY_VERSION_ID_KEY, keyVersionId);
+            }});
+        }
         return asymmetricDecryptDKmsRequest;
     }
 

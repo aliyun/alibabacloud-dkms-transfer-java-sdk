@@ -3,6 +3,7 @@ package com.aliyun.kms.handlers;
 import com.aliyun.dkms.gcs.openapi.util.models.RuntimeOptions;
 import com.aliyun.dkms.gcs.sdk.Client;
 import com.aliyun.kms.utils.Constants;
+import com.aliyun.tea.utils.StringUtils;
 import com.aliyuncs.AcsRequest;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.http.HttpResponse;
@@ -12,6 +13,7 @@ import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,12 @@ public class GetPublicKeyTransferHandler implements KmsTransferHandler<com.aliyu
         GetPublicKeyRequest getPublicKeyKmsRequest = (GetPublicKeyRequest) request;
         com.aliyun.dkms.gcs.sdk.models.GetPublicKeyRequest getPublicKeyDKmsRequest = new com.aliyun.dkms.gcs.sdk.models.GetPublicKeyRequest();
         getPublicKeyDKmsRequest.setKeyId(getPublicKeyKmsRequest.getKeyId());
+        final String keyVersionId = getPublicKeyKmsRequest.getKeyVersionId();
+        if(!StringUtils.isEmpty(keyVersionId)) {
+            getPublicKeyDKmsRequest.setRequestHeaders(new HashMap<String, String>() {{
+                put(Constants.MIGRATION_KEY_VERSION_ID_KEY, keyVersionId);
+            }});
+        }
         return getPublicKeyDKmsRequest;
     }
 

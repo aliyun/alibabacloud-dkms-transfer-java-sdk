@@ -13,6 +13,7 @@ import org.apache.http.HttpStatus;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +54,12 @@ public class AsymmetricSignTransferHandler implements KmsTransferHandler<com.ali
         signDKmsRequest.setAlgorithm(asymmetricSignKmsRequest.getAlgorithm());
         signDKmsRequest.setMessage(base64.decode(asymmetricSignKmsRequest.getDigest()));
         signDKmsRequest.setMessageType(DIGEST_MESSAGE_TYPE);
+        final String keyVersionId = asymmetricSignKmsRequest.getKeyVersionId();
+        if(!com.aliyuncs.utils.StringUtils.isEmpty(keyVersionId)) {
+            signDKmsRequest.setRequestHeaders(new HashMap<String, String>() {{
+                put(Constants.MIGRATION_KEY_VERSION_ID_KEY, keyVersionId);
+            }});
+        }
         return signDKmsRequest;
     }
 
