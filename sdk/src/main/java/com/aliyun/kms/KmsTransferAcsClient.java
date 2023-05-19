@@ -39,17 +39,6 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         initKmsTransferHandlers();
     }
 
-    public KmsTransferAcsClient(Config config, boolean isUseKmsShareGateway) throws ClientException {
-        super();
-        this.isUseKmsShareGateway = isUseKmsShareGateway;
-        try {
-            client = new Client(config);
-        } catch (Exception e) {
-            throw new ClientException(e);
-        }
-        initKmsTransferHandlers();
-    }
-
     public KmsTransferAcsClient(String regionId, Config config) throws ClientException {
         super(regionId);
         try {
@@ -60,15 +49,9 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         initKmsTransferHandlers();
     }
 
-    public KmsTransferAcsClient(String regionId, Config config, boolean isUseKmsShareGateway) throws ClientException {
+    public KmsTransferAcsClient(String regionId) throws ClientException {
         super(regionId);
-        this.isUseKmsShareGateway = isUseKmsShareGateway;
-        try {
-            client = new Client(config);
-        } catch (Exception e) {
-            throw new ClientException(e);
-        }
-        initKmsTransferHandlers();
+        this.isUseKmsShareGateway = true;
     }
 
     public KmsTransferAcsClient(IClientProfile profile, Config config) {
@@ -82,16 +65,9 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         initKmsTransferHandlers();
     }
 
-    public KmsTransferAcsClient(IClientProfile profile, Config config, boolean isUseKmsShareGateway) {
+    public KmsTransferAcsClient(IClientProfile profile) {
         super(profile);
-        ignoreSSLCerts = profile.getHttpClientConfig() == null ? false : profile.getHttpClientConfig().isIgnoreSSLCerts();
-        this.isUseKmsShareGateway = isUseKmsShareGateway;
-        try {
-            client = new Client(config);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        initKmsTransferHandlers();
+        this.isUseKmsShareGateway = true;
     }
 
     public KmsTransferAcsClient(IClientProfile profile, AlibabaCloudCredentials credentials, Config config) {
@@ -105,16 +81,9 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         initKmsTransferHandlers();
     }
 
-    public KmsTransferAcsClient(IClientProfile profile, AlibabaCloudCredentials credentials, Config config, boolean isUseKmsShareGateway) {
+    public KmsTransferAcsClient(IClientProfile profile, AlibabaCloudCredentials credentials) {
         super(profile, credentials);
-        ignoreSSLCerts = profile.getHttpClientConfig() == null ? false : profile.getHttpClientConfig().isIgnoreSSLCerts();
-        this.isUseKmsShareGateway = isUseKmsShareGateway;
-        try {
-            client = new Client(config);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        initKmsTransferHandlers();
+        this.isUseKmsShareGateway = true;
     }
 
     public KmsTransferAcsClient(IClientProfile profile, AlibabaCloudCredentialsProvider credentialsProvider, Config config) {
@@ -128,16 +97,9 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         initKmsTransferHandlers();
     }
 
-    public KmsTransferAcsClient(IClientProfile profile, AlibabaCloudCredentialsProvider credentialsProvider, Config config, boolean isUseKmsShareGateway) {
+    public KmsTransferAcsClient(IClientProfile profile, AlibabaCloudCredentialsProvider credentialsProvider) {
         super(profile, credentialsProvider);
-        ignoreSSLCerts = profile.getHttpClientConfig() == null ? false : profile.getHttpClientConfig().isIgnoreSSLCerts();
-        this.isUseKmsShareGateway = isUseKmsShareGateway;
-        try {
-            client = new Client(config);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        initKmsTransferHandlers();
+        this.isUseKmsShareGateway = true;
     }
 
     private void initKmsTransferHandlers() {
@@ -155,7 +117,7 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
 
     @Override
     public <T extends AcsResponse> HttpResponse doAction(AcsRequest<T> request, String regionId, Credential credential) throws ClientException, ServerException {
-        if (handlers.containsKey(request.getSysActionName()) && !isUseKmsShareGateway) {
+        if (!isUseKmsShareGateway && handlers.containsKey(request.getSysActionName())) {
             return dispatchDKmsAction(handlers.get(request.getSysActionName()), request);
         }
         return super.doAction(request, regionId, credential);
