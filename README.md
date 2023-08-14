@@ -35,7 +35,7 @@ The recommended way to use the Alibaba Cloud Dedicated KMS Transfer Client for J
 <dependency>
     <groupId>com.aliyun.kms</groupId>
     <artifactId>kms-transfer-client</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
