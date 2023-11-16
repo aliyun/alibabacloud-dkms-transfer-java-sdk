@@ -32,6 +32,7 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
     public KmsTransferAcsClient(Config config) throws ClientException {
         super();
         try {
+            setUserAgent(config);
             client = new Client(config);
         } catch (Exception e) {
             throw new ClientException(e);
@@ -42,6 +43,7 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
     public KmsTransferAcsClient(String regionId, Config config) throws ClientException {
         super(regionId);
         try {
+            setUserAgent(config);
             client = new Client(config);
         } catch (Exception e) {
             throw new ClientException(e);
@@ -58,6 +60,7 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         super(profile);
         ignoreSSLCerts = profile.getHttpClientConfig() == null ? false : profile.getHttpClientConfig().isIgnoreSSLCerts();
         try {
+            setUserAgent(config);
             client = new Client(config);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -74,6 +77,7 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         super(profile, credentials);
         ignoreSSLCerts = profile.getHttpClientConfig() == null ? false : profile.getHttpClientConfig().isIgnoreSSLCerts();
         try {
+            setUserAgent(config);
             client = new Client(config);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -90,6 +94,7 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         super(profile, credentialsProvider);
         ignoreSSLCerts = profile.getHttpClientConfig() == null ? false : profile.getHttpClientConfig().isIgnoreSSLCerts();
         try {
+            setUserAgent(config);
             client = new Client(config);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -145,4 +150,11 @@ public class KmsTransferAcsClient extends DefaultAcsClient {
         return handler.handlerDKmsRequestWithOptions(request, runtimeOptions);
     }
 
+    private void setUserAgent(Config config) {
+        if (config.getUserAgent() != null) {
+            config.setUserAgent(SDK_USER_AGENT + " " + config.getUserAgent());
+        } else {
+            config.setUserAgent(SDK_USER_AGENT);
+        }
+    }
 }
