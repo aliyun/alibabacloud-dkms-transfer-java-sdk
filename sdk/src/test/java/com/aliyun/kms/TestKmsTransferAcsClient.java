@@ -31,7 +31,8 @@ public class TestKmsTransferAcsClient {
         config.setClientKeyContent(properties.getProperty("config.clientKeyContent"));
         config.setPassword(properties.getProperty("config.password"));
         config.setEndpoint(properties.getProperty("config.endpoint"));
-        DefaultProfile profile = DefaultProfile.getProfile(properties.getProperty("config.kms.regionId"), System.getenv("accessKeyId"), System.getenv("accessKeySecret"));
+        DefaultProfile profile = DefaultProfile.getProfile(properties.getProperty("config.regionId"), System.getenv("AccessKeyId"), System.getenv("AccessKeySecret"));
+        profile.addEndpoint(properties.getProperty("config.regionId"),"kms",properties.getProperty("kms.endpoint"));
         HttpClientConfig clientConfig = HttpClientConfig.getDefault();
         clientConfig.setIgnoreSSLCerts(Boolean.parseBoolean(properties.getProperty("ignoreSSLCerts")));
         profile.setHttpClientConfig(clientConfig);
