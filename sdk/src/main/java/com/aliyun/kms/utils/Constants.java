@@ -20,4 +20,7 @@ public interface Constants {
     String MIGRATION_KEY_VERSION_ID_KEY = "x-kms-migrationkeyversionid";
     int NUMBER_OF_BYTES_AES_256 = 32;
     int NUMBER_OF_BYTES_AES_128 = 16;
+    String SDK_NAME = "alibabacloud-dkms-transfer-java-sdk";
+    String SDK_VERSION = "0.2.1";
+    String SDK_USER_AGENT = SDK_NAME + "/" + SDK_VERSION;
 }
