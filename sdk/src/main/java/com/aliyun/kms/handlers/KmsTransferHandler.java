@@ -118,6 +118,10 @@ public interface KmsTransferHandler<DReq extends TeaModel, DRep extends TeaModel
         return new ClientException(MISSING_PARAMETER_ERROR_CODE, String.format("The parameter  %s  needed but no provided.", paramName));
     }
 
+    default ClientException newInvalidParameterClientException(String paramName) {
+        return new ClientException(INVALID_PARAMETER_ERROR_CODE, String.format("The parameter  %s  is invalid.", paramName));
+    }
+
     default byte[] getHttpContent(FormatType acceptFormat, AcsResponse response) throws ClientException {
         if (FormatType.JSON.equals(acceptFormat)) {
             return gson.toJson(response).getBytes(StandardCharsets.UTF_8);
