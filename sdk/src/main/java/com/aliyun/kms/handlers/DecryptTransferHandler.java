@@ -50,6 +50,9 @@ public class DecryptTransferHandler implements KmsTransferHandler<com.aliyun.dkm
         }
         com.aliyun.dkms.gcs.sdk.models.DecryptRequest decryptDKmsRequest = new com.aliyun.dkms.gcs.sdk.models.DecryptRequest();
         byte[] ciphertextBlob = base64.decode(decryptKmsRequest.getCiphertextBlob());
+        if (ciphertextBlob.length <= Constants.EKT_ID_LENGTH + GCM_IV_LENGTH) {
+            throw newInvalidParameterClientException("CiphertextBlob");
+        }
         byte[] ektIdBytes = Arrays.copyOfRange(ciphertextBlob, 0, Constants.EKT_ID_LENGTH);
         byte[] ivBytes = Arrays.copyOfRange(ciphertextBlob, Constants.EKT_ID_LENGTH, Constants.EKT_ID_LENGTH + GCM_IV_LENGTH);
         byte[] ciphertextBytes = Arrays.copyOfRange(ciphertextBlob, Constants.EKT_ID_LENGTH + GCM_IV_LENGTH, ciphertextBlob.length);
